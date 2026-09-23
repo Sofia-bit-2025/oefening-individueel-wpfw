@@ -1,0 +1,34 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 64 64"
+  width="64"
+  height="64"
+  role="img"
+  aria-labelledby="title"
+>
+  <title id="title">Sofia favicon</title>
+
+  <rect
+    x="2"
+    y="2"
+    width="60"
+    height="60"
+    rx="14"
+    fill="#14213d"
+    stroke="#2563eb"
+    stroke-width="2"
+  />
+
+  <text
+    x="50%"
+    y="50%"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    font-size="34"
+    font-weight="700"
+    fill="#ffffff"
+  >
+    S
+  </text>
+</svg>
