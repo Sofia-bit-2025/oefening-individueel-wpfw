@@ -8,10 +8,13 @@
 
     <meta
       name="description"
-      content="Projectoverzicht van Sofia, Software Engineering student. Nieuwe softwareprojecten worden toegevoegd zodra ze beschikbaar zijn."
+      content="Softwareprojecten van Sofia met gebruikte technieken, categorieën en projectstatus."
     />
+
     <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="assets/css/style.css" />
+
+    <script src="assets/js/projects.js" defer></script>
   </head>
 
   <body>
@@ -27,12 +30,29 @@
 
         <nav aria-label="Hoofdnavigatie">
           <ul class="nav-list">
-            <li><a href="index.html">Home</a></li>
             <li>
-              <a href="projects.html" aria-current="page">Projecten</a>
+              <a href="index.html">
+                Home
+              </a>
             </li>
-            <li><a href="blog.html">Blog</a></li>
-            <li><a href="contact.html">Contact</a></li>
+
+            <li>
+              <a href="projects.html" aria-current="page">
+                Projecten
+              </a>
+            </li>
+
+            <li>
+              <a href="blog.html">
+                Blog
+              </a>
+            </li>
+
+            <li>
+              <a href="contact.html">
+                Contact
+              </a>
+            </li>
           </ul>
         </nav>
       </div>
@@ -41,31 +61,106 @@
     <main id="main-content">
       <section class="page-intro" aria-labelledby="projects-title">
         <div class="container">
-          <h1 id="projects-title">Projecten</h1>
+          <h1 id="projects-title">
+            Projecten
+          </h1>
 
           <p class="lead">
-            Hier komt een overzicht van softwareprojecten die ik zelfstandig
-            ontwerp en ontwikkel.
+            Een overzicht van softwareprojecten waaraan ik werk en de technieken
+            die ik daarbij gebruik.
           </p>
         </div>
       </section>
 
-      <section class="section" aria-labelledby="development-title">
+      <section class="section" aria-labelledby="overview-title">
         <div class="container">
-          <h2 id="development-title">Projecten in voorbereiding</h2>
+          <h2 id="overview-title">
+            Projectoverzicht
+          </h2>
 
-          <div class="prose">
-            <p>
-              Op dit moment staan er nog geen zelfstandige projecten op deze
-              pagina.
-            </p>
+          <p class="section__intro">
+            Filter projecten op categorie of sorteer ze alfabetisch op titel.
+          </p>
 
-            <p>
-              Deze pagina wordt aangevuld met projectbeschrijvingen, gebruikte
-              technieken, broncode en demonstraties zodra de projecten
-              beschikbaar zijn.
-            </p>
+          <div class="projects-controls">
+            <fieldset class="projects-controls__group">
+              <legend>
+                Categorie
+              </legend>
+
+              <div class="projects-filter">
+                <button
+                  type="button"
+                  class="projects-filter__button"
+                  data-category="all"
+                  aria-pressed="true"
+                >
+                  Alle
+                </button>
+
+                <button
+                  type="button"
+                  class="projects-filter__button"
+                  data-category="web"
+                  aria-pressed="false"
+                >
+                  Web
+                </button>
+
+                <button
+                  type="button"
+                  class="projects-filter__button"
+                  data-category="database"
+                  aria-pressed="false"
+                >
+                  Database
+                </button>
+
+                <button
+                  type="button"
+                  class="projects-filter__button"
+                  data-category="ai"
+                  aria-pressed="false"
+                >
+                  AI
+                </button>
+              </div>
+            </fieldset>
+
+            <div class="projects-sort">
+              <label for="sort-direction">
+                Sorteer op titel
+              </label>
+
+              <select id="sort-direction">
+                <option value="asc">
+                  A → Z
+                </option>
+
+                <option value="desc">
+                  Z → A
+                </option>
+              </select>
+            </div>
           </div>
+
+          <p
+            id="projects-status"
+            class="note"
+            role="status"
+          ></p>
+
+          <ul
+            id="projects-list"
+            class="card-grid card-grid--projects"
+            aria-label="Softwareprojecten"
+          ></ul>
+
+          <noscript>
+            <p class="note">
+              JavaScript is nodig om het projectoverzicht te tonen.
+            </p>
+          </noscript>
         </div>
       </section>
     </main>

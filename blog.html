@@ -8,8 +8,9 @@
 
     <meta
       name="description"
-      content="Technische notities van Sofia over software engineering, softwareontwikkeling en onderwerpen die zij onderzoekt."
+      content="Technische notities van Sofia over software engineering, JavaScript, databases, API's en andere studieonderwerpen."
     />
+
     <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="assets/css/style.css" />
   </head>
@@ -27,12 +28,29 @@
 
         <nav aria-label="Hoofdnavigatie">
           <ul class="nav-list">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="projects.html">Projecten</a></li>
             <li>
-              <a href="blog.html" aria-current="page">Blog</a>
+              <a href="index.html">
+                Home
+              </a>
             </li>
-            <li><a href="contact.html">Contact</a></li>
+
+            <li>
+              <a href="projects.html">
+                Projecten
+              </a>
+            </li>
+
+            <li>
+              <a href="blog.html" aria-current="page">
+                Blog
+              </a>
+            </li>
+
+            <li>
+              <a href="contact.html">
+                Contact
+              </a>
+            </li>
           </ul>
         </nav>
       </div>
@@ -41,7 +59,9 @@
     <main id="main-content">
       <section class="page-intro" aria-labelledby="blog-title">
         <div class="container">
-          <h1 id="blog-title">Blog</h1>
+          <h1 id="blog-title">
+            Blog
+          </h1>
 
           <p class="lead">
             Hier verzamel ik technische notities over software engineering,
@@ -53,19 +73,57 @@
 
       <section class="section" aria-labelledby="posts-title">
         <div class="container">
-          <h2 id="posts-title">Technische notities</h2>
+          <h2 id="posts-title">
+            Technische notities
+          </h2>
 
-          <div class="prose">
-            <p>
-              Op dit moment zijn er nog geen publicaties.
-            </p>
+          <p class="section__intro">
+            Hier publiceer ik later korte technische uitwerkingen en
+            leerervaringen uit mijn studie en softwareprojecten.
+          </p>
 
-            <p>
-              Nieuwe notities verschijnen hier wanneer ik technische
-              onderwerpen uitwerk en mijn ervaringen uit softwareprojecten
-              vastleg.
+          <div class="post-list">
+            <p class="note">
+              Nog geen technische notities gepubliceerd.
             </p>
           </div>
+        </div>
+      </section>
+
+      <section
+        class="section section--muted"
+        aria-labelledby="topics-title"
+      >
+        <div class="container">
+          <h2 id="topics-title">
+            Onderwerpen
+          </h2>
+
+          <p class="section__intro">
+            De notities sluiten aan op onderwerpen die ik tijdens mijn opleiding
+            en projecten verder uitwerk.
+          </p>
+
+          <ul
+            class="tag-list"
+            aria-label="Onderwerpen van technische notities"
+          >
+            <li class="tag">
+              Software Engineering
+            </li>
+
+            <li class="tag">
+              JavaScript
+            </li>
+
+            <li class="tag">
+              Databases
+            </li>
+
+            <li class="tag">
+              API's
+            </li>
+          </ul>
         </div>
       </section>
     </main>
