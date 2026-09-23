@@ -7,9 +7,9 @@ const projects = [
     category: "web",
     technologies: ["HTML5", "CSS", "Accessibility"],
     status: "Afgerond",
-    liveUrl: "https://sofia-bit-2025.github.io/wpfw-portfolio-sofia/",
+    liveUrl: "https://sofia-bit-2025.github.io/oefening-individueel-wpfw/",
     repositoryUrl:
-      "https://github.com/Sofia-bit-2025/wpfw-portfolio-sofia",
+      "https://sofia-bit-2025.github.io/oefening-individueel-wpfw/",
   },
   {
     id: 2,
@@ -65,9 +65,7 @@ let sortDirection = "asc";
 
 const projectsList = document.querySelector("#projects-list");
 const projectsStatus = document.querySelector("#projects-status");
-const filterButtons = document.querySelectorAll(
-  ".projects-filter__button",
-);
+const filterButtons = document.querySelectorAll(".projects-filter__button");
 const sortSelect = document.querySelector("#sort-direction");
 
 const filterProjects = (projectList, category) => {
@@ -75,9 +73,7 @@ const filterProjects = (projectList, category) => {
     return projectList;
   }
 
-  return projectList.filter(
-    (project) => project.category === category,
-  );
+  return projectList.filter((project) => project.category === category);
 };
 
 const sortProjects = (projectList, direction) => {
@@ -184,12 +180,7 @@ const createProjectItem = (project) => {
     technologyList.appendChild(technologyItem);
   }
 
-  article.append(
-    status,
-    title,
-    description,
-    technologyList,
-  );
+  article.append(status, title, description, technologyList);
 
   if (project.liveUrl || project.repositoryUrl) {
     article.appendChild(createProjectActions(project));
@@ -211,17 +202,11 @@ const updateProjectsStatus = (numberOfProjects) => {
   }
 
   const projectLabel =
-    numberOfProjects === 1
-      ? "1 project"
-      : `${numberOfProjects} projecten`;
+    numberOfProjects === 1 ? "1 project" : `${numberOfProjects} projecten`;
 
-  const sortLabel =
-    sortDirection === "asc"
-      ? "A tot Z"
-      : "Z tot A";
+  const sortLabel = sortDirection === "asc" ? "A tot Z" : "Z tot A";
 
-  projectsStatus.textContent =
-    `${projectLabel} weergegeven, gesorteerd van ${sortLabel}.`;
+  projectsStatus.textContent = `${projectLabel} weergegeven, gesorteerd van ${sortLabel}.`;
 };
 
 const renderProjects = (projectList) => {
@@ -243,15 +228,9 @@ const renderProjects = (projectList) => {
 };
 
 const updateProjects = () => {
-  const filteredProjects = filterProjects(
-    projects,
-    selectedCategory,
-  );
+  const filteredProjects = filterProjects(projects, selectedCategory);
 
-  const sortedProjects = sortProjects(
-    filteredProjects,
-    sortDirection,
-  );
+  const sortedProjects = sortProjects(filteredProjects, sortDirection);
 
   renderProjects(sortedProjects);
 };
@@ -260,18 +239,14 @@ const setActiveFilterButton = (activeButton) => {
   for (const button of filterButtons) {
     const isActive = button === activeButton;
 
-    button.setAttribute(
-      "aria-pressed",
-      String(isActive),
-    );
+    button.setAttribute("aria-pressed", String(isActive));
   }
 };
 
 const handleFilterClick = (event) => {
   const button = event.currentTarget;
 
-  selectedCategory =
-    button.dataset.category ?? CATEGORY_ALL;
+  selectedCategory = button.dataset.category ?? CATEGORY_ALL;
 
   setActiveFilterButton(button);
   updateProjects();
@@ -289,16 +264,10 @@ const initProjectsPage = () => {
   }
 
   for (const button of filterButtons) {
-    button.addEventListener(
-      "click",
-      handleFilterClick,
-    );
+    button.addEventListener("click", handleFilterClick);
   }
 
-  sortSelect.addEventListener(
-    "change",
-    handleSortChange,
-  );
+  sortSelect.addEventListener("change", handleSortChange);
 
   updateProjects();
 };
