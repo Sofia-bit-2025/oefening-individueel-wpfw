@@ -1,268 +1,213 @@
-<!doctype html>
-<html lang="nl">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+const GITHUB_USERNAME = "Sofia-bit-2025";
+const MAX_REPOSITORIES = 6;
 
-    <title>Sofia — Software Engineering</title>
+const githubStatus = document.querySelector("#github-status");
+const githubRepositories = document.querySelector(
+  "#github-repositories",
+);
 
-    <meta
-      name="description"
-      content="Portfolio van Sofia, Software Engineering student met focus op backend development, databases, API's en softwarearchitectuur."
-    />
+const githubApiUrl =
+  `https://api.github.com/users/${GITHUB_USERNAME}/repos` +
+  `?sort=updated&direction=desc&per_page=${MAX_REPOSITORIES}`;
 
-    <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/css/style.css" />
+const clearStatusClasses = () => {
+  if (!githubStatus) {
+    return;
+  }
 
-    <script src="assets/js/github.js" defer></script>
-  </head>
+  githubStatus.classList.remove(
+    "api-status--success",
+    "api-status--error",
+  );
+};
 
-  <body>
-    <a class="skip-link" href="#main-content">
-      Ga naar hoofdinhoud
-    </a>
+const showLoadingStatus = () => {
+  if (!githubStatus) {
+    return;
+  }
 
-    <header class="site-header">
-      <div class="container site-header__inner">
-        <a class="site-logo" href="index.html">
-          Sofia<span class="site-logo__dot" aria-hidden="true">.</span>
-        </a>
+  clearStatusClasses();
 
-        <nav aria-label="Hoofdnavigatie">
-          <ul class="nav-list">
-            <li>
-              <a href="index.html" aria-current="page">
-                Home
-              </a>
-            </li>
+  githubStatus.textContent = "GitHub-gegevens laden...";
+};
 
-            <li>
-              <a href="projects.html">
-                Projecten
-              </a>
-            </li>
+const showSuccessStatus = (repositoryCount) => {
+  if (!githubStatus) {
+    return;
+  }
 
-            <li>
-              <a href="blog.html">
-                Blog
-              </a>
-            </li>
+  clearStatusClasses();
 
-            <li>
-              <a href="contact.html">
-                Contact
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </header>
+  githubStatus.classList.add("api-status--success");
 
-    <main id="main-content">
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="container hero__inner">
-          <div class="hero__content">
-            <p class="eyebrow">
-              Software Engineering
-            </p>
+  if (repositoryCount === 1) {
+    githubStatus.textContent =
+      "1 recente publieke repository geladen.";
+    return;
+  }
 
-            <img
-              class="hero__accent"
-              src="assets/images/hero-accent.svg"
-              alt=""
-              aria-hidden="true"
-              width="180"
-              height="32"
-            />
+  githubStatus.textContent =
+    `${repositoryCount} recente publieke repositories geladen.`;
+};
 
-            <h1 id="hero-title">
-              Sofia
-            </h1>
+const showErrorStatus = () => {
+  if (!githubStatus) {
+    return;
+  }
 
-            <p class="hero__lead">
-              Ik studeer Software Engineering aan De Haagse Hogeschool. Mijn
-              interesse ligt bij backend development, databases, API's en
-              softwarearchitectuur.
-            </p>
+  clearStatusClasses();
 
-            <p class="hero__actions">
-              <a
-                class="hero__action hero__action--primary"
-                href="projects.html"
-              >
-                Bekijk projecten
-              </a>
+  githubStatus.classList.add("api-status--error");
 
-              <a
-                class="hero__action"
-                href="contact.html"
-              >
-                Contact
-              </a>
-            </p>
-          </div>
+  githubStatus.textContent =
+    "GitHub-gegevens konden niet worden geladen. " +
+    "Gebruik de GitHub-link hierboven om mijn repositories te bekijken.";
+};
 
-          <div class="hero__media">
-            <img
-              class="hero__portrait"
-              src="assets/images/profile-placeholder.svg"
-              alt=""
-              aria-hidden="true"
-              width="320"
-              height="320"
-            />
-          </div>
-        </div>
-      </section>
+const formatUpdatedDate = (dateString) => {
+  const date = new Date(dateString);
 
-      <section
-        class="section section--muted"
-        aria-labelledby="focus-title"
-      >
-        <div class="container">
-          <h2 id="focus-title">
-            Technische focus
-          </h2>
+  return new Intl.DateTimeFormat("nl-NL", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+};
 
-          <p class="section__intro">
-            Ik leer complete applicaties ontwerpen: van API en businesslogica
-            tot database en interface.
-          </p>
+const createRepositoryTitle = (repository) => {
+  const title = document.createElement("h3");
 
-          <ul
-            class="tag-list"
-            aria-label="Technische vaardigheden"
-          >
-            <li class="tag">C#</li>
-            <li class="tag">.NET</li>
-            <li class="tag">ASP.NET Core</li>
-            <li class="tag">JavaScript</li>
-            <li class="tag">SQL</li>
-            <li class="tag">REST API</li>
-            <li class="tag">Git</li>
-          </ul>
-        </div>
-      </section>
+  const link = document.createElement("a");
+  link.href = repository.html_url;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.textContent = repository.name;
+  link.setAttribute(
+    "aria-label",
+    `Bekijk ${repository.name} op GitHub`,
+  );
 
-      <section
-        class="section"
-        aria-labelledby="projects-title"
-      >
-        <div class="container">
-          <h2 id="projects-title">
-            Projecten
-          </h2>
+  title.appendChild(link);
 
-          <p class="section__intro">
-            Bekijk mijn softwareprojecten en de technieken die ik daarbij
-            gebruik.
-          </p>
+  return title;
+};
 
-          <p>
-            <a href="projects.html">
-              Bekijk projecten →
-            </a>
-          </p>
-        </div>
-      </section>
+const createRepositoryDescription = (repository) => {
+  const description = document.createElement("p");
 
-      <section
-        class="section section--muted"
-        aria-labelledby="github-title"
-      >
-        <div class="container">
-          <h2 id="github-title">
-            GitHub
-          </h2>
+  description.textContent =
+    repository.description ||
+    "Geen beschrijving beschikbaar.";
 
-          <p class="section__intro">
-            Bekijk mijn publieke repositories en recent bijgewerkte
-            softwareprojecten op
-            <a href="https://github.com/Sofia-bit-2025">
-              GitHub
-            </a>.
-          </p>
+  return description;
+};
 
-          <p
-            id="github-status"
-            class="api-status"
-            aria-live="polite"
-          >
-            GitHub-gegevens laden...
-          </p>
+const createRepositoryTags = (repository) => {
+  const tagList = document.createElement("ul");
+  tagList.className = "tag-list";
+  tagList.setAttribute(
+    "aria-label",
+    `Informatie over ${repository.name}`,
+  );
 
-          <ul
-            id="github-repositories"
-            class="card-grid"
-            aria-label="Recente publieke GitHub-repositories"
-          ></ul>
+  if (repository.language) {
+    const languageItem = document.createElement("li");
 
-          <noscript>
-            <p class="note">
-              JavaScript is nodig om actuele GitHub-gegevens te tonen. Mijn
-              publieke repositories zijn ook rechtstreeks via de GitHub-link
-              hierboven beschikbaar.
-            </p>
-          </noscript>
-        </div>
-      </section>
+    languageItem.className = "tag";
+    languageItem.textContent = repository.language;
 
-      <section
-        class="section"
-        aria-labelledby="blog-title"
-      >
-        <div class="container">
-          <h2 id="blog-title">
-            Blog
-          </h2>
+    tagList.appendChild(languageItem);
+  }
 
-          <p class="section__intro">
-            Technische notities over software engineering,
-            softwareontwikkeling en onderwerpen die ik tijdens mijn studie
-            onderzoek.
-          </p>
+  const updatedItem = document.createElement("li");
 
-          <p>
-            <a href="blog.html">
-              Bekijk technische notities →
-            </a>
-          </p>
-        </div>
-      </section>
+  updatedItem.className = "tag";
+  updatedItem.textContent =
+    `Bijgewerkt ${formatUpdatedDate(repository.updated_at)}`;
 
-      <section
-        class="section section--muted"
-        aria-labelledby="ai-title"
-      >
-        <div class="container">
-          <h2 id="ai-title">
-            Richting AI Engineering
-          </h2>
+  tagList.appendChild(updatedItem);
 
-          <p class="section__intro">
-            Op langere termijn wil ik software engineering combineren met data,
-            machine learning en AI-integratie.
-          </p>
+  return tagList;
+};
 
-          <ul
-            class="tag-list"
-            aria-label="Leergebieden richting AI Engineering"
-          >
-            <li class="tag">Python</li>
-            <li class="tag">Machine learning</li>
-            <li class="tag">Data engineering</li>
-            <li class="tag">AI API's</li>
-          </ul>
-        </div>
-      </section>
-    </main>
+const createRepositoryCard = (repository) => {
+  const listItem = document.createElement("li");
 
-    <footer class="site-footer">
-      <div class="container site-footer__inner">
-        <p class="site-footer__text">
-          Sofia — Software Engineering
-        </p>
-      </div>
-    </footer>
-  </body>
-</html>
+  const article = document.createElement("article");
+  article.className = "card";
+
+  const title = createRepositoryTitle(repository);
+  const description =
+    createRepositoryDescription(repository);
+  const tags = createRepositoryTags(repository);
+
+  article.append(
+    title,
+    description,
+    tags,
+  );
+
+  listItem.appendChild(article);
+
+  return listItem;
+};
+
+const renderRepositories = (repositories) => {
+  if (!githubRepositories) {
+    return;
+  }
+
+  githubRepositories.replaceChildren();
+
+  const fragment = document.createDocumentFragment();
+
+  for (const repository of repositories) {
+    fragment.appendChild(
+      createRepositoryCard(repository),
+    );
+  }
+
+  githubRepositories.appendChild(fragment);
+};
+
+const getPublicRepositories = async () => {
+  const response = await fetch(githubApiUrl, {
+    headers: {
+      Accept: "application/vnd.github+json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `GitHub API gaf status ${response.status}.`,
+    );
+  }
+
+  return response.json();
+};
+
+const loadGitHubRepositories = async () => {
+  if (!githubStatus || !githubRepositories) {
+    return;
+  }
+
+  showLoadingStatus();
+
+  try {
+    const repositories =
+      await getPublicRepositories();
+
+    renderRepositories(repositories);
+    showSuccessStatus(repositories.length);
+  } catch (error) {
+    githubRepositories.replaceChildren();
+    showErrorStatus();
+
+    console.error(
+      "GitHub repositories laden mislukt:",
+      error,
+    );
+  }
+};
+
+loadGitHubRepositories();

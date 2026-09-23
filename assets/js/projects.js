@@ -7,6 +7,9 @@ const projects = [
     category: "web",
     technologies: ["HTML5", "CSS", "Accessibility"],
     status: "Afgerond",
+    liveUrl: "https://sofia-bit-2025.github.io/wpfw-portfolio-sofia/",
+    repositoryUrl:
+      "https://github.com/Sofia-bit-2025/wpfw-portfolio-sofia",
   },
   {
     id: 2,
@@ -103,6 +106,45 @@ const getStatusClass = (status) => {
   return "";
 };
 
+const createProjectActions = (project) => {
+  const actions = document.createElement("div");
+  actions.className = "card__actions";
+
+  if (project.liveUrl) {
+    const liveLink = document.createElement("a");
+
+    liveLink.className = "card__link card__link--primary";
+    liveLink.href = project.liveUrl;
+    liveLink.target = "_blank";
+    liveLink.rel = "noopener noreferrer";
+    liveLink.textContent = "Bekijk live site";
+    liveLink.setAttribute(
+      "aria-label",
+      `Bekijk ${project.title} als live site`,
+    );
+
+    actions.appendChild(liveLink);
+  }
+
+  if (project.repositoryUrl) {
+    const repositoryLink = document.createElement("a");
+
+    repositoryLink.className = "card__link";
+    repositoryLink.href = project.repositoryUrl;
+    repositoryLink.target = "_blank";
+    repositoryLink.rel = "noopener noreferrer";
+    repositoryLink.textContent = "Bekijk broncode";
+    repositoryLink.setAttribute(
+      "aria-label",
+      `Bekijk broncode van ${project.title}`,
+    );
+
+    actions.appendChild(repositoryLink);
+  }
+
+  return actions;
+};
+
 const createProjectItem = (project) => {
   const listItem = document.createElement("li");
 
@@ -148,6 +190,10 @@ const createProjectItem = (project) => {
     description,
     technologyList,
   );
+
+  if (project.liveUrl || project.repositoryUrl) {
+    article.appendChild(createProjectActions(project));
+  }
 
   listItem.appendChild(article);
 
