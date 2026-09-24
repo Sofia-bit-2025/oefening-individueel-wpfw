@@ -1,141 +1,91 @@
-const FIELD_ERROR_MESSAGES = {
-  nameRequired: "Vul je naam in.",
-  nameLength: "Gebruik minimaal 2 tekens voor je naam.",
-
-  emailRequired: "Vul je e-mailadres in.",
-  emailInvalid:
-    "Vul een geldig e-mailadres in, bijvoorbeeld naam@voorbeeld.nl.",
-
-  messageRequired: "Schrijf een bericht.",
-  messageLength: "Gebruik minimaal 10 tekens voor je bericht.",
-};
-
-const getTrimmedValue = (field) => {
-  return field.value.trim();
+const REQUIRED_MESSAGES = {
+  name: "Vul je naam in.",
+  email: "Vul je e-mailadres in.",
+  message: "Schrijf een bericht.",
 };
 
 const getErrorElement = (field) => {
-  const errorId = field.getAttribute("aria-describedby");
+  const errorId =
+    field.getAttribute("aria-describedby");
 
-  if (!errorId) {
-    return null;
-  }
-
-  return document.getElementById(errorId);
+  return errorId
+    ? document.getElementById(errorId)
+    : null;
 };
 
-const showFieldError = (field, message) => {
-  const errorElement = getErrorElement(field);
+const getErrorMessage = (field) => {
+  const value = field.value.trim();
 
-  field.setAttribute("aria-invalid", "true");
-
-  if (errorElement) {
-    errorElement.textContent = message;
-  }
-};
-
-const clearFieldError = (field) => {
-  const errorElement = getErrorElement(field);
-
-  field.setAttribute("aria-invalid", "false");
-
-  if (errorElement) {
-    errorElement.textContent = "";
-  }
-};
-
-const getNameError = (value) => {
-  if (value.length === 0) {
-    return FIELD_ERROR_MESSAGES.nameRequired;
+  if (field.required && value === "") {
+    return (
+      REQUIRED_MESSAGES[field.name] ??
+      "Dit veld is verplicht."
+    );
   }
 
-  if (value.length < 2) {
-    return FIELD_ERROR_MESSAGES.nameLength;
+  if (
+    field.type === "email" &&
+    field.validity.typeMismatch
+  ) {
+    return "Vul een geldig e-mailadres in.";
   }
 
-  return "";
-};
-
-const getEmailError = (field, value) => {
-  if (value.length === 0) {
-    return FIELD_ERROR_MESSAGES.emailRequired;
-  }
-
-  if (field.validity.typeMismatch) {
-    return FIELD_ERROR_MESSAGES.emailInvalid;
-  }
-
-  return "";
-};
-
-const getMessageError = (value) => {
-  if (value.length === 0) {
-    return FIELD_ERROR_MESSAGES.messageRequired;
-  }
-
-  if (value.length < 10) {
-    return FIELD_ERROR_MESSAGES.messageLength;
-  }
-
-  return "";
-};
-
-const getFieldError = (field) => {
-  const value = getTrimmedValue(field);
-
-  if (field.name === "name") {
-    return getNameError(value);
-  }
-
-  if (field.name === "email") {
-    return getEmailError(field, value);
-  }
-
-  if (field.name === "message") {
-    return getMessageError(value);
+  if (
+    field.minLength > 0 &&
+    value.length < field.minLength
+  ) {
+    return `Gebruik minimaal ${field.minLength} tekens.`;
   }
 
   return "";
 };
 
 const validateField = (field) => {
-  const errorMessage = getFieldError(field);
+  const errorMessage =
+    getErrorMessage(field);
 
-  if (errorMessage) {
-    showFieldError(field, errorMessage);
-    return false;
-  }
+  const errorElement =
+    getErrorElement(field);
 
-  clearFieldError(field);
-  return true;
-};
+  const isValid =
+    errorMessage === "";
 
-const validateForm = (form) => {
-  const fields = form.querySelectorAll(".form__input");
+  field.setAttribute(
+    "aria-invalid",
+    String(!isValid),
+  );
 
-  let isValid = true;
-  let firstInvalidField = null;
-
-  for (const field of fields) {
-    const fieldIsValid = validateField(field);
-
-    if (!fieldIsValid) {
-      isValid = false;
-
-      if (!firstInvalidField) {
-        firstInvalidField = field;
-      }
-    }
-  }
-
-  if (firstInvalidField) {
-    firstInvalidField.focus();
+  if (errorElement) {
+    errorElement.textContent =
+      errorMessage;
   }
 
   return isValid;
 };
 
-const showFormStatus = (statusElement, message, type) => {
+const validateForm = (fields) => {
+  let firstInvalidField = null;
+
+  for (const field of fields) {
+    const isValid =
+      validateField(field);
+
+    if (
+      !isValid &&
+      !firstInvalidField
+    ) {
+      firstInvalidField = field;
+    }
+  }
+
+  return firstInvalidField;
+};
+
+const setFormStatus = (
+  statusElement,
+  message,
+  type = null,
+) => {
   statusElement.textContent = message;
 
   statusElement.classList.remove(
@@ -143,49 +93,58 @@ const showFormStatus = (statusElement, message, type) => {
     "form__status--error",
   );
 
-  if (type === "success") {
-    statusElement.classList.add("form__status--success");
-  }
-
-  if (type === "error") {
-    statusElement.classList.add("form__status--error");
+  if (type) {
+    statusElement.classList.add(
+      `form__status--${type}`,
+    );
   }
 };
 
-const clearFormStatus = (statusElement) => {
-  showFormStatus(statusElement, "", null);
-};
-
-const handleFieldInput = (event, statusElement) => {
+const handleFieldBlur = (event) => {
   const field = event.currentTarget;
 
-  clearFormStatus(statusElement);
+  validateField(field);
+};
 
-  if (field.getAttribute("aria-invalid") === "true") {
+const handleFieldInput = (
+  event,
+  statusElement,
+) => {
+  const field = event.currentTarget;
+
+  setFormStatus(statusElement, "");
+
+  const wasInvalid =
+    field.getAttribute("aria-invalid") ===
+    "true";
+
+  if (wasInvalid) {
     validateField(field);
   }
 };
 
-const handleSubmit = (event, statusElement) => {
+const handleSubmit = (
+  event,
+  fields,
+  statusElement,
+) => {
   event.preventDefault();
 
-  const form = event.currentTarget;
+  const firstInvalidField =
+    validateForm(fields);
 
-  clearFormStatus(statusElement);
-
-  const isValid = validateForm(form);
-
-  if (!isValid) {
-    showFormStatus(
+  if (firstInvalidField) {
+    setFormStatus(
       statusElement,
       "Controleer de gemarkeerde velden.",
       "error",
     );
 
+    firstInvalidField.focus();
     return;
   }
 
-  showFormStatus(
+  setFormStatus(
     statusElement,
     "Je invoer is geldig. De gegevens zijn niet verzonden.",
     "success",
@@ -193,24 +152,50 @@ const handleSubmit = (event, statusElement) => {
 };
 
 const initContactForm = () => {
-  const form = document.querySelector("#contact-form");
-  const statusElement = document.querySelector("#form-status");
+  const form =
+    document.querySelector(
+      "#contact-form",
+    );
+
+  const statusElement =
+    document.querySelector(
+      "#form-status",
+    );
 
   if (!form || !statusElement) {
     return;
   }
 
-  const fields = form.querySelectorAll(".form__input");
+  const requiredFields =
+    form.querySelectorAll("[required]");
 
-  for (const field of fields) {
-    field.addEventListener("input", (event) => {
-      handleFieldInput(event, statusElement);
-    });
+  for (const field of requiredFields) {
+    field.addEventListener(
+      "blur",
+      handleFieldBlur,
+    );
+
+    field.addEventListener(
+      "input",
+      (event) => {
+        handleFieldInput(
+          event,
+          statusElement,
+        );
+      },
+    );
   }
 
-  form.addEventListener("submit", (event) => {
-    handleSubmit(event, statusElement);
-  });
+  form.addEventListener(
+    "submit",
+    (event) => {
+      handleSubmit(
+        event,
+        requiredFields,
+        statusElement,
+      );
+    },
+  );
 };
 
 initContactForm();

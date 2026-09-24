@@ -1,71 +1,12 @@
-const GITHUB_USERNAME = "Sofia-bit-2025";
-const MAX_REPOSITORIES = 6;
+const GITHUB_API_URL =
+  "https://api.github.com/repos/Sofia-bit-2025/wpfw-portfolio-sofia";
 
-const githubStatus = document.querySelector("#github-status");
-const githubRepositories = document.querySelector(
-  "#github-repositories",
-);
-
-const githubApiUrl =
-  `https://api.github.com/users/${GITHUB_USERNAME}/repos` +
-  `?sort=updated&direction=desc&per_page=${MAX_REPOSITORIES}`;
-
-const clearStatusClasses = () => {
-  if (!githubStatus) {
-    return;
-  }
-
-  githubStatus.classList.remove(
-    "api-status--success",
-    "api-status--error",
-  );
-};
-
-const showLoadingStatus = () => {
-  if (!githubStatus) {
-    return;
-  }
-
-  clearStatusClasses();
-
-  githubStatus.textContent = "GitHub-gegevens laden...";
-};
-
-const showSuccessStatus = (repositoryCount) => {
-  if (!githubStatus) {
-    return;
-  }
-
-  clearStatusClasses();
-
-  githubStatus.classList.add("api-status--success");
-
-  if (repositoryCount === 1) {
-    githubStatus.textContent =
-      "1 recente publieke repository geladen.";
-    return;
-  }
-
-  githubStatus.textContent =
-    `${repositoryCount} recente publieke repositories geladen.`;
-};
-
-const showErrorStatus = () => {
-  if (!githubStatus) {
-    return;
-  }
-
-  clearStatusClasses();
-
-  githubStatus.classList.add("api-status--error");
-
-  githubStatus.textContent =
-    "GitHub-gegevens konden niet worden geladen. " +
-    "Gebruik de GitHub-link hierboven om mijn repositories te bekijken.";
-};
-
-const formatUpdatedDate = (dateString) => {
+const formatDate = (dateString) => {
   const date = new Date(dateString);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Datum onbekend";
+  }
 
   return new Intl.DateTimeFormat("nl-NL", {
     day: "numeric",
@@ -74,60 +15,30 @@ const formatUpdatedDate = (dateString) => {
   }).format(date);
 };
 
-const createRepositoryTitle = (repository) => {
-  const title = document.createElement("h3");
-
-  const link = document.createElement("a");
-  link.href = repository.html_url;
-  link.target = "_blank";
-  link.rel = "noopener noreferrer";
-  link.textContent = repository.name;
-  link.setAttribute(
-    "aria-label",
-    `Bekijk ${repository.name} op GitHub`,
+const isValidRepository = (repository) => {
+  return (
+    repository &&
+    typeof repository === "object" &&
+    typeof repository.name === "string" &&
+    typeof repository.html_url === "string" &&
+    typeof repository.updated_at === "string"
   );
-
-  title.appendChild(link);
-
-  return title;
 };
 
-const createRepositoryDescription = (repository) => {
-  const description = document.createElement("p");
+const fetchRepository = async () => {
+  const response = await fetch(GITHUB_API_URL);
 
-  description.textContent =
-    repository.description ||
-    "Geen beschrijving beschikbaar.";
-
-  return description;
-};
-
-const createRepositoryTags = (repository) => {
-  const tagList = document.createElement("ul");
-  tagList.className = "tag-list";
-  tagList.setAttribute(
-    "aria-label",
-    `Informatie over ${repository.name}`,
-  );
-
-  if (repository.language) {
-    const languageItem = document.createElement("li");
-
-    languageItem.className = "tag";
-    languageItem.textContent = repository.language;
-
-    tagList.appendChild(languageItem);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
   }
 
-  const updatedItem = document.createElement("li");
+  const repository = await response.json();
 
-  updatedItem.className = "tag";
-  updatedItem.textContent =
-    `Bijgewerkt ${formatUpdatedDate(repository.updated_at)}`;
+  if (!isValidRepository(repository)) {
+    throw new Error("Onverwachte GitHub API-response.");
+  }
 
-  tagList.appendChild(updatedItem);
-
-  return tagList;
+  return repository;
 };
 
 const createRepositoryCard = (repository) => {
@@ -136,15 +47,48 @@ const createRepositoryCard = (repository) => {
   const article = document.createElement("article");
   article.className = "card";
 
-  const title = createRepositoryTitle(repository);
-  const description =
-    createRepositoryDescription(repository);
-  const tags = createRepositoryTags(repository);
+  const title = document.createElement("h3");
+
+  const link = document.createElement("a");
+  link.href = repository.html_url;
+  link.textContent = repository.name;
+
+  title.appendChild(link);
+
+  const description = document.createElement("p");
+  description.textContent =
+    repository.description ||
+    "Geen beschrijving beschikbaar.";
+
+  const information = document.createElement("ul");
+  information.className = "tag-list";
+
+  information.setAttribute(
+    "aria-label",
+    `Repositoryinformatie voor ${repository.name}`,
+  );
+
+  if (repository.language) {
+    const language = document.createElement("li");
+
+    language.className = "tag";
+    language.textContent = repository.language;
+
+    information.appendChild(language);
+  }
+
+  const updated = document.createElement("li");
+
+  updated.className = "tag";
+  updated.textContent =
+    `Bijgewerkt ${formatDate(repository.updated_at)}`;
+
+  information.appendChild(updated);
 
   article.append(
     title,
     description,
-    tags,
+    information,
   );
 
   listItem.appendChild(article);
@@ -152,62 +96,75 @@ const createRepositoryCard = (repository) => {
   return listItem;
 };
 
-const renderRepositories = (repositories) => {
-  if (!githubRepositories) {
+const renderRepository = (
+  repositoryListElement,
+  repository,
+) => {
+  repositoryListElement.replaceChildren(
+    createRepositoryCard(repository),
+  );
+};
+
+const setApiStatus = (
+  statusElement,
+  message,
+  isError = false,
+) => {
+  statusElement.textContent = message;
+  statusElement.hidden = message === "";
+
+  statusElement.classList.toggle(
+    "api-status--error",
+    isError,
+  );
+};
+
+const initGitHubRepository = async () => {
+  const statusElement =
+    document.querySelector("#github-status");
+
+  const repositoryListElement =
+    document.querySelector("#github-repositories");
+
+  if (
+    !statusElement ||
+    !repositoryListElement
+  ) {
     return;
   }
 
-  githubRepositories.replaceChildren();
-
-  const fragment = document.createDocumentFragment();
-
-  for (const repository of repositories) {
-    fragment.appendChild(
-      createRepositoryCard(repository),
-    );
-  }
-
-  githubRepositories.appendChild(fragment);
-};
-
-const getPublicRepositories = async () => {
-  const response = await fetch(githubApiUrl, {
-    headers: {
-      Accept: "application/vnd.github+json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `GitHub API gaf status ${response.status}.`,
-    );
-  }
-
-  return response.json();
-};
-
-const loadGitHubRepositories = async () => {
-  if (!githubStatus || !githubRepositories) {
-    return;
-  }
-
-  showLoadingStatus();
+  setApiStatus(
+    statusElement,
+    "Repository laden...",
+  );
 
   try {
-    const repositories =
-      await getPublicRepositories();
+    const repository =
+      await fetchRepository();
 
-    renderRepositories(repositories);
-    showSuccessStatus(repositories.length);
+    renderRepository(
+      repositoryListElement,
+      repository,
+    );
+
+    setApiStatus(
+      statusElement,
+      "",
+    );
   } catch (error) {
-    githubRepositories.replaceChildren();
-    showErrorStatus();
+    repositoryListElement.replaceChildren();
+
+    setApiStatus(
+      statusElement,
+      "De repositorygegevens konden niet worden geladen. Probeer het later opnieuw.",
+      true,
+    );
 
     console.error(
-      "GitHub repositories laden mislukt:",
+      "GitHub repository laden mislukt:",
       error,
     );
   }
 };
 
-loadGitHubRepositories();
+initGitHubRepository();

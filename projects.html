@@ -8,7 +8,7 @@
 
     <meta
       name="description"
-      content="Softwareprojecten van Sofia met gebruikte technieken, categorieën en projectstatus."
+      content="Het huidige softwareproject van Sofia met gebruikte technieken en technische details."
     />
 
     <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml" />
@@ -66,81 +66,37 @@
           </h1>
 
           <p class="lead">
-            Een overzicht van softwareprojecten waaraan ik werk en de technieken
-            die ik daarbij gebruik.
+            Op dit moment werk ik aan mijn WPFW-portfolio. Hier laat ik zien
+            welke technieken ik gebruik en hoe ik het project technisch opbouw.
           </p>
         </div>
       </section>
 
-      <section class="section" aria-labelledby="overview-title">
+      <section class="section" aria-labelledby="project-title">
         <div class="container">
-          <h2 id="overview-title">
-            Projectoverzicht
+          <h2 id="project-title">
+            Huidig project
           </h2>
 
           <p class="section__intro">
-            Filter projecten op categorie of sorteer ze alfabetisch op titel.
+            Het project wordt vanuit JavaScript-data opgebouwd. Je kunt zoeken
+            op titel, beschrijving of techniek en de technische details bekijken.
           </p>
 
           <div class="projects-controls">
-            <fieldset class="projects-controls__group">
-              <legend>
-                Categorie
-              </legend>
-
-              <div class="projects-filter">
-                <button
-                  type="button"
-                  class="projects-filter__button"
-                  data-category="all"
-                  aria-pressed="true"
-                >
-                  Alle
-                </button>
-
-                <button
-                  type="button"
-                  class="projects-filter__button"
-                  data-category="web"
-                  aria-pressed="false"
-                >
-                  Web
-                </button>
-
-                <button
-                  type="button"
-                  class="projects-filter__button"
-                  data-category="database"
-                  aria-pressed="false"
-                >
-                  Database
-                </button>
-
-                <button
-                  type="button"
-                  class="projects-filter__button"
-                  data-category="ai"
-                  aria-pressed="false"
-                >
-                  AI
-                </button>
-              </div>
-            </fieldset>
-
-            <div class="projects-sort">
-              <label for="sort-direction">
-                Sorteer op titel
+            <div class="projects-search">
+              <label for="project-search">
+                Zoek project
               </label>
 
-              <select id="sort-direction">
-                <option value="asc">
-                  A → Z
-                </option>
-
-                <option value="desc">
-                  Z → A
-                </option>
-              </select>
+              <input
+                class="form__input"
+                type="search"
+                id="project-search"
+                placeholder="Bijvoorbeeld JavaScript"
+                autocomplete="off"
+                aria-controls="projects-list"
+              />
             </div>
           </div>
 
@@ -152,13 +108,13 @@
 
           <ul
             id="projects-list"
-            class="card-grid card-grid--projects"
+            class="card-grid"
             aria-label="Softwareprojecten"
           ></ul>
 
           <noscript>
             <p class="note">
-              JavaScript is nodig om het projectoverzicht te tonen.
+              JavaScript is nodig om de projecten te tonen.
             </p>
           </noscript>
         </div>
